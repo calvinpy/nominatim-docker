@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER Jan Nonnen <helvalius@gmail.com>
+MAINTAINER Jan Wijffels <jwijffels@bnosac.be>
 
 RUN apt-get update
 
@@ -64,7 +64,8 @@ RUN service postgresql start && \
   sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
   sudo -u postgres psql postgres -c "DROP DATABASE IF EXISTS nominatim"
 
-RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/monaco-latest.osm.pbf
+RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/belgium-latest.osm.pbf
+# RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/monaco-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/luxembourg-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
