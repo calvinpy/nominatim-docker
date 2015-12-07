@@ -53,41 +53,28 @@ RUN ./autogen.sh
 RUN ./configure
 RUN make
 
-# Configure postgresql
-RUN service postgresql start && \
-  pg_dropcluster --stop 9.3 main
-RUN service postgresql start && \
-  pg_createcluster --start -e UTF-8 9.3 main
-
-RUN service postgresql start && \
-  sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
-  sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
-  sudo -u postgres psql postgres -c "DROP DATABASE IF EXISTS nominatim"
-
 RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/belgium-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/monaco-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/luxembourg-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america-latest.osm.pbf
 # RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
-
 WORKDIR /app/nominatim
 
 ADD local.php /app/nominatim/settings/local.php
-
-
 RUN ./utils/setup.php --help
 
-
 RUN service postgresql start && \
+  pg_dropcluster --stop 9.3 main && \
+  pg_createcluster --start -e UTF-8 9.3 main && \
+  sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
+  sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
+  sudo -u postgres psql postgres -c "DROP DATABASE IF EXISTS nominatim" && \
   sudo -u nominatim ./utils/setup.php --osm-file /app/data.pbf --all --threads 2
-
 
 RUN mkdir -p /var/www/nominatim
 RUN ls settings/
 RUN cat settings/local.php
 RUN ./utils/setup.php --create-website /var/www/nominatim
-
-
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible.
