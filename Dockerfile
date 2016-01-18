@@ -53,11 +53,7 @@ RUN ./autogen.sh
 RUN ./configure
 RUN make
 
-RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/belgium-latest.osm.pbf
-# RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/monaco-latest.osm.pbf
-# RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/luxembourg-latest.osm.pbf
-# RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america-latest.osm.pbf
-# RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/north-america/us/delaware-latest.osm.pbf
+RUN wget --output-document=/app/data.pbf http://download.geofabrik.de/europe/spain-latest.osm.pbf
 WORKDIR /app/nominatim
 
 ADD local.php /app/nominatim/settings/local.php
